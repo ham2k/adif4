@@ -15,7 +15,7 @@ The problem:
 
 The proposal:
 
-* Produce a new major version of the standard, ADIF 4.
+* Produce a [new "epoch"](https://www.adif.org/316/ADIF_316.htm#Header_Field_ADIF_VER) of the standard: ADIF 4.
 * Make all ambiguous points in the standard explicit.
 * Define a new "encoding" header so that apps can explicitly state which encoding they are using.
 * Declare "US-ASCII" as the default encoding, and require apps to support importing and exporting it in order to be considered "compliant".
