@@ -1,5 +1,7 @@
 # ADIF 4 - A Proposal
 
+By Sebastián Delmont KI2D <ki2d@ham2k.com>
+
 ### TL;DR
 
 The problem:
