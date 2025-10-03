@@ -24,6 +24,11 @@ By Sebastián Delmont • KI2D • <ki2d@ham2k.com>
 * Suggest that apps should support "Latin1" imports, and might even consider this the default encoding when importing pre-ADIF 4 files.
 * Allow apps to attempt to detect, and correct, possible mis-encodings in files that do not have an "encoding" header.
 
+### More context:
+
+* There's a [summary of other proposals discussed](#other-proposals) at the end of this document.
+* There's a [survey of existing apps](survey-results/README.md) that were tested to see how they handled different types of encodings and field counts.
+
 ---
 
 # Why do we need to talk about changes to the standard?
@@ -157,5 +162,166 @@ it should now say:
 >An application might attempt to correct mis-encoded data when appropriate, such as detecting Latin-1 or UTF-8 sequences in a file supposed to be US-ASCII.
 >
 >ADI files are typically exported with a .adi file name extension. Applications should additionally accept files with a .adif file name extension.
+
+
+
+---
+
+# Other Proposals
+
+Note: This list is comprehensive, but certainly not exhaustive. It represents the interpretation and opinions of the author of this document,Sebastian KI2D. Feel free to follow the links to the original discussions. And of course, feel free to contribute any additional information or comments you consider relevant.
+
+
+### Encoding headers, with byte counts, and Latin1 as the default encoding
+
+This was the initial proposal by Sebastian KI2D [in this discussion](https://groups.io/g/adifdev/message/10315)
+
+It would look like `<NAME:10>Sebastián <NOTES:36>이건 예시예요` encoded in UTF-8 (note the `10` and `36` because of multi-byte UTF-8 sequences).
+
+Or like `<NAME:9>Sebastián <NOTES:7>?? ????` encoded in Latin-1 (note the `9`).
+
+The discussion started around how it would be hard for users manually editing a file to properly count the bytes in a UTF-8 string.
+
+This made us realize that indeed, the unit of counting was not necesarily bytes, and that an existing compliant application might misinterpret a field count for an UTF-8 string and read fewer bytes than expected, and then if the subsequent bytes contained something that looks like a field, such application would potentially skip the field or even the entire record. But also an existing compliant application might use Unicode text primitives to read the data and then misinterpret the field count as characters and read more characters than the original file intended, thus potentially causing the next field to be skipped or the entire record to be misinterpreted.
+
+This discussison made Thomas VA2NW and Sebastian KI2D start a survey of existing apps to test how they handled different types of encodings and field counts. These [survey results](survey-results/README.md) pointed out that there were significant numbers of existing, popular apps on both camps, and that the original assumption that "Latin1 is the most common implementation in the real world" was not supported by the data.
+
+We also realized that implementing a format with byte counts in applications that use Unicode primitives would require them to rebuild their entire parsing logic to use raw bytes, and convert certain strings in certain ways, which in turn would mean the ADIF format is not "a text file" but rather a binary format.
+
+Conclusion:
+* Breaks backwards compatibility.
+* Implementation in Unicode apps would be more complex than currently.
+
+Learnings:
+* The ambiguity in the standard created a problem where apps implemented it using two mutually-incompatible interpretations. There is no way to solve the issue of Unicode support without accepting both interpretations as valid.
+
+
+### Encoding headers, with byte counts, but default to UTF-8
+
+Proposed by Greg K9CTS [in this discussion](https://groups.io/g/adifdev/message/10322) on Sep 14, 2025.
+
+While this suffered from the same problems as the previous proposal, it showcased the need to focus on Unicode support as the end goal.
+
+Conclusion:
+* Same as above.
+
+### Change main encoding to Latin 1, use separate _INTL fields with UTF-8 and byte counts
+
+Proposed by Dave AA6YQ [in this discussion](https://groups.io/g/adifdev/message/10332) on Sep 14, 2025.
+
+It would look like `<NAME:9>Sebastián <NAME_INTL:10>Sebastián <NOTES:7>?? ???? <NOTES_INTL:36>이건 예시예요` encoded in Latin-1.
+
+Having a new field to hold the Unicode data means that the problem of providing Unicode support is only solved when a significant number of applications are updated to support it, and until then data loss would be likely. Applications might not prioritize implementation until most other apps have also done so, which means we have a chicken-and-egg problem.
+
+Also, having two fields introduces a problem of vague semantics. What happens if only the _INTL field is present? What happens if an application allows the user to update `NAME` but just passes `NAME_INTL` through?
+
+And finally, it turns the standard from "text based" to a "binary format" where different parts of the file use different encodings.
+
+Conclusion:
+* Would work, but only after most apps are updated to support it.
+* Causes data loss when doing round-trips with existing applications.
+
+Learnings:
+* Solutions that use separate fields are bound to suffer from round-trip problems.
+
+
+### Use original fields, with HTML entity encoding
+
+Proposed by Sebastian KI2D [in this discussion](https://groups.io/g/adifdev/message/10393) on Sep 15, 2025, and later clarified and proposed again [in this discussion](https://groups.io/g/adifdev/message/10872) on Sep 28, 2025.
+
+It would look like `<NAME:16>Sebasti&aacute;n <NOTES:49>&#xC774;&#xAC74; &#xC608;&#xC2DC;&#xC608;&#xC694;` encoded in US-ASCII.
+
+By using HTML entity encoding (formally, ["character reference encoding"](https://en.wikipedia.org/wiki/Character_encodings_in_HTML#Character_references)) we ensure that an ADIF file remains limited to US-ASCII characters, but provide a way to encode and decode any Unicode character.
+
+Implementation would require some changes, but uses an encoding mechanism that has broad support in the industry (it's used by XML, HTML and more) and for which there are well-tested libraries available on every language, framework and platform.
+
+In this discussion, and other threads, some people, starting with Jack W6FB in [this message](https://groups.io/g/adifdev/message/10416), expressed the opinion that an existing application displaying something like "Sebasti&aacute;n" could be considered as breaking backwards compatibility.
+
+Conclusion:
+* Works, but requires broad adoption.
+* No data loss when doing round-trips with existing applications.
+
+Learnings:
+* Some people consider extraneous characters in existing applications to be a backwards compatibility issue.
+
+
+### Use separate _INTL fields, with Base64 encoding
+
+There was no explicit proposal for this, but Thomas VA2NW suggested using base64 in [this message](https://groups.io/g/adifdev/message/10433) and was later discussed that this would only be acceptable if used on separate fields.
+
+It would look like `<NAME:9>Sebasti?n <NAME_INTL:16>U2ViYXN0acOhbg== <NOTES:7>?? ???? <NOTES_INTL:28>7J2E6rG0IOyYiOyEnOyYieyWtA==` encoded in US-ASCII.
+
+Conclusion:
+* Same problems as other _INTL proposals.
+
+### Use separate _INTL fields, with HTML entity encoding
+
+This was mentioned by Sebastian KI2D as an alternative to base64, potentially providing more legibility in cases where the data is limited to Latin1.
+
+It would look like `<NAME:9>Sebastián <NAME_INTL:16>Sebasti&aacute;n <NOTES:7>?? ???? <NOTES_INTL:49>&#xC774;&#xAC74; &#xC608;&#xC2DC;&#xC608;&#xC694;` encoded in Latin-1.
+
+Conclusion:
+* Same problems as other _INTL proposals.
+
+### Encoding headers, only allow ISO 8859 encodings
+
+Proposed by Dave AA6YQ [in this discussion](https://groups.io/g/adifdev/message/10730) on Sep 24, 2025. Dave also suggested it for a vote [in this message](https://groups.io/g/adifdev/topic/request_for_vote/115441785) a day later. No vote happened.
+
+It would look like `<NAME:9>Sebastián <NOTES:7>?? ????` encoded in Latin-1 (note the `9`). It would not be able to encode `이건 예시예요`.
+
+This proposal is similar to the original proposal, but tries to sidestep the bytes-vs-character debate by only allowing ISO 8859 encodings.
+
+It would preclude the use of UTF-8 and limit files to use a single code page at a time.
+
+It would also seem to declare that ADIF is not just "a text file" but a "text file in a limited set of 8-bit encodings", thus limiting future options.
+
+Conclusion:
+* Breaks backwards compatibility, limits future options, does not solve the problem of extended characters.
+
+### New ADIF container: ADU
+
+Proposed by Thomas VA2NW [in this discussion](https://groups.io/g/adifdev/message/10843) on Sep 28, 2025.
+
+This proposal allows for full Unicode support, but in files that use a new file extension, `.adu`.
+
+It would look like `<NAME:9>Sebastián <NOTES:7>이건 예시예요` encoded in UTF-8.
+
+It keeps the same base format, field definitions, etc, which makes implementation a lot easier.
+
+Its use of a different container and file extension prevents any compatibility issues with existing applications.
+
+But even if it's easy to implement, it requires applications to somehow present the choice of container to their users. And these users don't necesarily have the context to make the decision.
+
+Users can still rename files between .adi and .adu and things would mostly work, but that requires manual intervention, and understanding what is going on.
+
+Conclusion:
+* Works, but might limit adoption and cause some confusion.
+
+Learnings:
+* Maybe it makes sense to make these proposed changes very explicit, such as the new extension proposed here, so that users are more aware of the fact that they are using a new format. This is what led Sebastian KI2D to include the idea of changing the epoch and call it ADIF 4, as a "softer hint that things have changed".
+
+
+### Replacement encoding, using the data between fields
+
+Also known as "Plan 10 for Inner Space", proposed by Graham G3ZOD [in this discussion](https://groups.io/g/adifdev/message/10949) on Sep 30, 2025.
+
+Trying to find a different path, Graham proposed an innovative approach, using the extra data between fields, which the standard allows, to include replacement data for a simplified string.
+
+It would look like `<NAME:9>Sebasti?n {{7=225}} <NOTES:7>?? ???? {{0=51060,1=44148,3=50696,4=49884,5=50696,6=50836}}`
+
+There were several other variants discussed, where the values in `{{...}}` could include the actual UTF-8 sequence, or the replacements could be represented as single UTF-8 characters, etc.
+
+Sebastian KI2D also pointed out that creating a novel encoding is not a trivial task, that it would be likely to introduce bugs (someone pointed out that you could insert a null byte with something like `{{3=0,...}}` and potentially break parsing, for example). And that using an existing encoding like Base64 or HTML entities would be a better choice. There was no agreement on this.
+
+But it was pointed out that ultimately, it suffers from the same problem that the "_INTL Field" proposals have: data is lost when doing a round trip in an existing application.
+
+Also, we could not reach agreement on whether "Sebasti&aacute;n" or "Sebasti?n" or even "Sebastian" were acceptable replacements for "Sebastián". But perhaps the distinction is clearer with "???????" being unacceptable replacement for "이건 예시예요".
+
+Conclusion:
+* Works, but only if everybody adopts it, and implementation is not trivial. Cannot do round-trip interoperation with existing apps.
+
+Learnings:
+* It was in this discussion that we realized that the data between fields could be used, as long as we did not include a "<" character. This is where the idea of using &lt; to escape UTF-8 strings and prevent breakage first popped up (see [this message](https://groups.io/g/adifdev/message/11113)) leading to the final proposal.
+* It was also in the discussion around what was an acceptable replacement that Sebastian KI2D first noted that any string with extended characters was a "new type of value" being introduced in a new version of the standard, and thus how an existing application represented it, or even failure to represent it, was not a backwards compatibility issue, in the same way that an older application failing to dislay `<MODE:4>MFSK<SUBMODE:3>FT4` as "FT4" was not a backwards compatibility issue.
 
 
