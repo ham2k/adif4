@@ -6,28 +6,27 @@ By Sebastián Delmont • KI2D • <ki2d@ham2k.com>
 
 ### The problem:
 
+* Users want to use "extended characters" in their logs. The standard does not allow it, but many applications do this in many incompatible ways.
 * ADIF is "text based", but does not specify the encoding to use in this "text", since this didn't matter for 7-bit ASCII.
 * ADIF uses "counts" to determine the length of the data in each field, but does not specify whether the counts should be in bytes or characters, since this didn't matter for US-ASCII.
-* Users want to use "extended characters" in their logs.
-* [Developers have used both](survey-results/README.md) 8-bit encodings and UTF-8 in their apps, and both are equivalent for 7-bit ASCII.
-* But once you add "extended characters", the two encodings are not equivalent, and apps can break not only by showing the wrong characters, but by truncating data, including extraneous data, or even dropping fields or entire records.
+* [Developers have used both](survey-results/README.md) 8-bit encodings and UTF-8 in their applications, and while both are equivalent for 7-bit ASCII, once you add "extended characters", the two encodings are not equivalent, and applications can break not only by showing the wrong characters, but by truncating data, including extraneous data, or even dropping fields or entire records.
 * ***So, we have, at the very least, three different ways to interpret the standard, based on which encoding you pick: ASCII, Latin1 and UTF-8.*** And these are incompatible with each other if you want to consider including "extended characters" in the standard.
 
 ### The proposal:
 
 * Produce a [new "epoch"](https://www.adif.org/316/ADIF_316.htm#Header_Field_ADIF_VER) of the standard: **ADIF 4**.
 * Make all ambiguous details regarding encodings in the standard more explicit.
-* Define a new `ENCODING` header so that apps can explicitly state which encoding they are using.
-* Declare "US-ASCII" as the default encoding, and require apps to support importing and exporting it in order to be considered compliant.
-* Declare that apps can reject encodings they don't support, and still be considered compliant, but explain to the user that the rejection was due to an unexpected encoding, provide a list of supported encodings, and point the user to the page at https://fixes.adif.org/, which provides users with tools to fix encoding issues and convert between encodings.
-* Suggest that apps should support "UTF-8" imports and exports.
-* Suggest that apps should support "Latin1" imports, and might even consider this the default encoding when importing pre-ADIF 4 files.
-* Allow apps to attempt to detect, and correct, possible mis-encodings in files that do not have an "encoding" header.
+* Define a new `ENCODING` header so that applications can explicitly state which encoding they are using.
+* Declare "US-ASCII" as the default encoding, and require applications to support importing and exporting it in order to be considered compliant.
+* Declare that applications can reject encodings they don't support, and still be considered compliant, but explain to the user that the rejection was due to an unexpected encoding, provide a list of supported encodings, and point the user to the page at https://fixes.adif.org/, which provides users with tools to fix encoding issues and convert between encodings.
+* Suggest that applications should support "UTF-8" imports and exports.
+* Suggest that applications should support "Latin1" imports, and might even consider this the default encoding when importing pre-ADIF 4 files.
+* Allow applications to attempt to detect, and correct, possible mis-encodings in files that do not have an "encoding" header.
 
 ### More context:
 
 * There's a [summary of other proposals discussed](#other-proposals) at the end of this document.
-* There's a [survey of existing apps](survey-results/README.md) that were tested to see how they handled different types of encodings and field counts.
+* There's a [survey of existing applicationss](survey-results/README.md) that were tested to see how they handled different types of encodings and field counts.
 
 ---
 
@@ -37,9 +36,9 @@ The [ADIF Standard](https://www.adif.org/316/ADIF_316.htm) was defined from the 
 
 The standard does explicitly state that `String` fields should be limited to ["ASCII [...] in the range of 32 through 126"](https://www.adif.org/316/ADIF_316.htm#:~:text=an%20ASCII%20character%20whose%20code%20lies%20in%20the%20range%20of%2032%20through%20126%2C%20inclusive). This is also known officially as "US-ASCII".
 
-However, in the real world, most apps alllowed users to enter "extended characters", such as accented letters like the "ñ" in "Muñoz", the "ü" in "Müller" or the "ß" in "Straße".
+However, in the real world, most applications alllowed users to enter "extended characters", such as accented letters like the "ñ" in "Muñoz", the "ü" in "Müller" or the "ß" in "Straße".
 
-And many apps include these "extended characters" in the ADIF files they export. This is clearly not compliant with the standard, but definitely prevalent (see [survey results](survey-results/README.md)).
+And many applications include these "extended characters" in the ADIF files they export. This is clearly not compliant with the standard, but definitely prevalent (see [survey results](survey-results/README.md)).
 
 There is a problem with this: once you get past the basic english alphabet and into "extended characters", there is no such thing as a "text file" anymore. The text has to be characterized by the encoding used to convert the characters to bytes.
 
@@ -55,7 +54,7 @@ But the two encodings are not compatible once you consider "extended characters"
 
 Now, the ADIF standard uses "counts" to determine the length of the data in each field. **But the standard never defined whether the counts should be in bytes or characters**. For "US-ASCII", the two are equivalent, but for "extended characters", they are not.
 
-And developers have implemented their apps using logic that assumes either encoding, [with major apps on either side of the fence](survey-results/README.md). Most likely this was the result of just using the "text primitives" available in their programming language or environment of choice. Old Win32 apps would have used the Windows API, which uses "Windows-1252" by default, while new .NET apps would have used the .NET Framework, which uses "UTF-8" by default. Newer languages like Java, Python and Javascript all use Unicode internally too.
+And developers have implemented their applications using logic that assumes either encoding, [with major applications on either side of the fence](survey-results/README.md). Most likely this was the result of just using the "text primitives" available in their programming language or environment of choice. Old Win32 applications would have used the Windows API, which uses "Windows-1252" by default, while new .NET applications would have used the .NET Framework, which uses "UTF-8" by default. Newer languages like Java, Python and Javascript all use Unicode internally too.
 
 So we have a "Schrödinger's Standard", that can be either US-ASCII, Latin1 or UTF-8 depending on who you ask, and you cannot really tell which it is until you bring extended characters into the mix.
 
@@ -73,43 +72,43 @@ Second, we should make all ambiguous points in the standard explicit. There's a 
 
 > One point of extensive discussion has been that we should allow developers to use "bytes" as the unit of measurement for counts, and use this for UTF-8 encoded files.
 >
-> Our counterargument is that if you mix UTF-8 with byte encodings, you end up with something that no longer is "text based" can be considered a binary format, because implementing this requires apps to open files as binary data in order to read bytes and not characters. This means the "encoding" applies only to certain fields and not the whole file.
+> Our counterargument is that if you mix UTF-8 with byte encodings, you end up with something that no longer is "text based" can be considered a binary format, because implementing this requires applications to open files as binary data in order to read bytes and not characters. This means the "encoding" applies only to certain fields and not the whole file.
 >
 > Another point that can be made is that this is not UTF-8 with byte encodings, but rather Latin-1 text with character counts, where the strings include characters that happen to match UTF-8 sequences. Something known as ["mojibake"](https://en.wikipedia.org/wiki/Mojibake).
 
-Third, to ensure backwards compatibility, we should declare that **"US-ASCII" is the default encoding**, and require apps to support importing and exporting it in order to be considered "compliant". This is because this is what the current standard defines; and the most prevalent scenario, by far, in the real world is that regardless of which encoding a developer used, the data is still limited to US-ASCII.
+Third, to ensure backwards compatibility, we should declare that **"US-ASCII" is the default encoding**, and require applications to support importing and exporting it in order to be considered "compliant". This is because this is what the current standard defines; and the most prevalent scenario, by far, in the real world is that regardless of which encoding a developer used, the data is still limited to US-ASCII.
 
-Fourth, we should suggest that **apps should support "UTF-8" imports and exports**. This broadens "extended character" support to the entire Unicode standard, and not just a small set like Latin-1 or Greek. New apps, and updated apps, should aim to support UTF-8 as their main encoding for interoperability purposes. For reference, UTF-8 is used by [98.8% of the world's web sites](https://w3techs.com/technologies/cross/character_encoding/ranking).
+Fourth, we should suggest that **applications should support "UTF-8" imports and exports**. This broadens "extended character" support to the entire Unicode standard, and not just a small set like Latin-1 or Greek. New applications, and updated applications, should aim to support UTF-8 as their main encoding for interoperability purposes. For reference, UTF-8 is used by [98.8% of the world's web sites](https://w3techs.com/technologies/cross/character_encoding/ranking).
 
-Fifth, while it is desirable, it is not reasonable to demand all developers to update their apps to support Unicode and UTF-8. Therefore, we should **allow apps to reject encodings they don't support, and still be considered "compliant"**.
+Fifth, while it is desirable, it is not reasonable to demand all developers to update their applications to support Unicode and UTF-8. Therefore, we should **allow applications to reject encodings they don't support, and still be considered "compliant"**.
 
-At the same time, we don't want to leave users stranded, so the standard should provide a page at https://fixes.adif.org/, that apps can refer their users to, which provides information and tools to help users address encoding issues and incompatible apps.
+At the same time, we don't want to leave users stranded, so the standard should provide a page at https://fixes.adif.org/, that applications can refer their users to, which provides information and tools to help users address encoding issues and incompatible applications.
 
-Sixth, we should suggest that **apps should support "Latin1" imports and exports**, and might even **consider looking for Latin1 characters mis-encoded in US-ASCII** files without a header. Many existing apps use Latin1 as their internal encoding, it's mostly backwards-compatible with apps that can deal with US-ASCII, and it's the most prevalent encoding currently used for "extended characters" in the real world of amateur radio. So allowing apps to do this to help users keep their data exchanges working the way they are today, even if this is not fully compliant with the existing standard. I believe it is a reasonable compromise to minimize impact on end users.
+Sixth, we should suggest that **applications should support "Latin1" imports and exports**, and might even **consider looking for Latin1 characters mis-encoded in US-ASCII** files without a header. Many existing applications use Latin1 as their internal encoding, it's mostly backwards-compatible with applications that can deal with US-ASCII, and it's the most prevalent encoding currently used for "extended characters" in the real world of amateur radio. So allowing applications to do this to help users keep their data exchanges working the way they are today, even if this is not fully compliant with the existing standard. I believe it is a reasonable compromise to minimize impact on end users.
 
-It **would not be unreasonable to actually declare "Latin1" as the official default encoding** for pre-ADIF 4 as long as we're ok with the implication that such a change would **make the new standard not be strictly backwards-compatible**. This would increase the likelihood, but not ensure, of a file exported from an existing app being interpreted correctly by an encoding-aware application. If we prefer to keep the standard strictly backwards-compatible, we can just leave it as a suggestion and keep US-ASCII as the default encoding.
+It **would not be unreasonable to actually declare "Latin1" as the official default encoding** for pre-ADIF 4 as long as we're ok with the implication that such a change would **make the new standard not be strictly backwards-compatible**. This would increase the likelihood, but not ensure, of a file exported from an existing application being interpreted correctly by an encoding-aware application. If we prefer to keep the standard strictly backwards-compatible, we can just leave it as a suggestion and keep US-ASCII as the default encoding.
 
-And Seventh, in order to ensure full backwards compatibility, and prevent existing compliant apps from misinterpreting a file encoded as UTF-8, but opened by an app that assumes that characters are bytes, **any encoding that uses more than one byte per character** (such as UTF-8) should perform one extra step, of **escaping any "<" character using the sequence "&lt;"** when exporting ADIF data, and unescaping it when importing such ADIF data. This prevents any app from mistaking unexpected data in a field for the start of the next field.
+And Seventh, in order to ensure full backwards compatibility, and prevent existing compliant applications from misinterpreting a file encoded as UTF-8, but opened by an application that assumes that characters are bytes, **any encoding that uses more than one byte per character** (such as UTF-8) should perform one extra step, of **escaping any "<" character using the sequence "&lt;"** when exporting ADIF data, and unescaping it when importing such ADIF data. This prevents any application from mistaking unexpected data in a field for the start of the next field.
 
 ---
 
-# What does this mean for existing apps?
+# What does this mean for existing applications?
 
-Any currently-compliant apps can remain unchanged and be able to interoperate with apps updated to ADIF 4 in all cases that were valid when the app was written. These apps should not miss any records or fields, and should be able to display all data correctly, as long as this data is limited to US-ASCII.
+Any currently-compliant applications can remain unchanged and be able to interoperate with applications updated to ADIF 4 in all cases that were valid when the application was written. These applications should not miss any records or fields, and should be able to display all data correctly, as long as this data is limited to US-ASCII.
 
-These apps can also remain unchanged and still be able to interoperate, with minimal data loss on non-mandatory fields with string data containing extended characters, when importing from ADIF 4 files with encodings other than US-ASCII. These apps would possibly display a truncated version of these strings, and/or replace any non-US-ASCII characters with "?" or similar. Since the standard has never specified what is the behavior of apps in the case of unexpected data in strings, this is not considered as breaking backwards compatibility, in the same way that an older app not displaying a newly defined enum value is not considered as breaking backwards compatibility.
+These applications can also remain unchanged and still be able to interoperate, with minimal data loss on non-mandatory fields with string data containing extended characters, when importing from ADIF 4 files with encodings other than US-ASCII. These applications would possibly display a truncated version of these strings, and/or replace any non-US-ASCII characters with "?" or similar. Since the standard has never specified what is the behavior of applications in the case of unexpected data in strings, this is not considered as breaking backwards compatibility, in the same way that an older application not displaying a newly defined enum value is not considered as breaking backwards compatibility.
 
-Most of these apps can also remain unchanged and still be able to interoperate with _most_ cases that are _prevalent_ in real world usage. In many cases they can exchange data containing extended characters with other apps that happen to use the same internal encodings, even if this is a non-compliant scenario.
+Most of these applications can also remain unchanged and still be able to interoperate with _most_ cases that are _prevalent_ in real world usage. In many cases they can exchange data containing extended characters with other applications that happen to use the same internal encodings, even if this is a non-compliant scenario.
 
-Most apps can be updated to improve their support for ADIF 4 just by adding an "encoding" header to their output files.
+Most applications can be updated to improve their support for ADIF 4 just by adding an "encoding" header to their output files.
 
-Most apps can improve this support by looking at the "encoding" header in the input file, and if it's not supported, they can offer their users a link to https://fixes.adif.org/.
+Most applications can improve this support by looking at the "encoding" header in the input file, and if it's not supported, they can offer their users a link to https://fixes.adif.org/.
 
-Most apps can achieve full compliance by offering their users different encoding options, including at the very minimum US-ASCII.
+Most applications can achieve full compliance by offering their users different encoding options, including at the very minimum US-ASCII.
 
-Most apps can improve their support for ADIF 4 by using mechanisms to transcode input files to whatever encoding they support internally. We intend to [provide tools to help with this](https://github.com/ham2k/transadif/), and the standard might provide guidance on this respect.
+Most applications can improve their support for ADIF 4 by using mechanisms to transcode input files to whatever encoding they support internally. We intend to [provide tools to help with this](https://github.com/ham2k/transadif/), and the standard might provide guidance on this respect.
 
-Most apps can improve their support even further by offering their users multiple encoding options when exporting, ideally including UTF-8 and Latin-1 at the very least.
+Most applications can improve their support even further by offering their users multiple encoding options when exporting, ideally including UTF-8 and Latin-1 at the very least.
 
 ----
 
@@ -184,16 +183,16 @@ The discussion started around how it would be hard for users manually editing a 
 
 This made us realize that indeed, the unit of counting was not necesarily bytes, and that an existing compliant application might misinterpret a field count for an UTF-8 string and read fewer bytes than expected, and then if the subsequent bytes contained something that looks like a field, such application would potentially skip the field or even the entire record. But also an existing compliant application might use Unicode text primitives to read the data and then misinterpret the field count as characters and read more characters than the original file intended, thus potentially causing the next field to be skipped or the entire record to be misinterpreted.
 
-This discussison made Thomas VA2NW and Sebastian KI2D start a survey of existing apps to test how they handled different types of encodings and field counts. These [survey results](survey-results/README.md) pointed out that there were significant numbers of existing, popular apps on both camps, and that the original assumption that "Latin1 is the most common implementation in the real world" was not supported by the data.
+This discussison made Thomas VA2NW and Sebastian KI2D start a survey of existing applications to test how they handled different types of encodings and field counts. These [survey results](survey-results/README.md) pointed out that there were significant numbers of existing, popular applications on both camps, and that the original assumption that "Latin1 is the most common implementation in the real world" was not supported by the data.
 
 We also realized that implementing a format with byte counts in applications that use Unicode primitives would require them to rebuild their entire parsing logic to use raw bytes, and convert certain strings in certain ways, which in turn would mean the ADIF format is not "a text file" but rather a binary format.
 
 Conclusion:
 * Breaks backwards compatibility.
-* Implementation in Unicode apps would be more complex than currently.
+* Implementation in Unicode applications would be more complex than currently.
 
 Learnings:
-* The ambiguity in the standard created a problem where apps implemented it using two mutually-incompatible interpretations. There is no way to solve the issue of Unicode support without accepting both interpretations as valid.
+* The ambiguity in the standard created a problem where applications implemented it using two mutually-incompatible interpretations. There is no way to solve the issue of Unicode support without accepting both interpretations as valid.
 
 
 ### Encoding headers, with byte counts, but default to UTF-8
@@ -211,14 +210,14 @@ Proposed by Dave AA6YQ [in this discussion](https://groups.io/g/adifdev/message/
 
 It would look like `<NAME:9>Sebastián <NAME_INTL:10>Sebastián <NOTES:7>?? ???? <NOTES_INTL:36>이건 예시예요` encoded in Latin-1.
 
-Having a new field to hold the Unicode data means that the problem of providing Unicode support is only solved when a significant number of applications are updated to support it, and until then data loss would be likely. Applications might not prioritize implementation until most other apps have also done so, which means we have a chicken-and-egg problem.
+Having a new field to hold the Unicode data means that the problem of providing Unicode support is only solved when a significant number of applications are updated to support it, and until then data loss would be likely. Applications might not prioritize implementation until most other applications have also done so, which means we have a chicken-and-egg problem.
 
 Also, having two fields introduces a problem of vague semantics. What happens if only the _INTL field is present? What happens if an application allows the user to update `NAME` but just passes `NAME_INTL` through?
 
 And finally, it turns the standard from "text based" to a "binary format" where different parts of the file use different encodings.
 
 Conclusion:
-* Would work, but only after most apps are updated to support it.
+* Would work, but only after most applications are updated to support it.
 * Causes data loss when doing round-trips with existing applications.
 
 Learnings:
@@ -318,7 +317,7 @@ But it was pointed out that ultimately, it suffers from the same problem that th
 Also, we could not reach agreement on whether "Sebasti&aacute;n" or "Sebasti?n" or even "Sebastian" were acceptable replacements for "Sebastián". But perhaps the distinction is clearer with "???????" being unacceptable replacement for "이건 예시예요".
 
 Conclusion:
-* Works, but only if everybody adopts it, and implementation is not trivial. Cannot do round-trip interoperation with existing apps.
+* Works, but only if everybody adopts it, and implementation is not trivial. Cannot do round-trip interoperation with existing applications.
 
 Learnings:
 * It was in this discussion that we realized that the data between fields could be used, as long as we did not include a "<" character. This is where the idea of using &lt; to escape UTF-8 strings and prevent breakage first popped up (see [this message](https://groups.io/g/adifdev/message/11113)) leading to the final proposal.
