@@ -15,6 +15,7 @@ Based on the files described in [test-files/README.md](test-files/README.md).
 | Hamlog.online      | 🇺🇳 | ✅�  | ✅    | 🟡�  | 🇺🇳 | 8️⃣s | ❌   |
 | Ham Radio Deluxe   | 🇺🇳 | ✅   | ✅�   | 🟡�  | 🇺🇳 | 8️⃣t | 🟡  |
 | HAMRS Pro          | 🇺🇳 | ✅�  | ✅    | ✅    | 🇺🇳 | 🇺🇳 | ❌   |
+| Ham Support        | 🇺🇳 | N/A | N/A  | N/A  | 🇺🇳 | 💾s  | ❌   |
 | Log4OM             | 🇺🇳 | ✅�  | ✅    | ✅    | 🇺🇳 | 🇺🇳 | ❌   |
 | Logger32           | 8️⃣  | ✅   | ✅�   | 🟡�  | 8️⃣  | 8️⃣  | ❌   |
 | MacLogger DX       | 🇺🇳 | ✅�  | ✅    | 🟡   | 🇺🇳 | 💾s  | 🟡  |
@@ -28,7 +29,6 @@ Based on the files described in [test-files/README.md](test-files/README.md).
 | WinLog32           | 8️⃣  | ✅   | ✅�   | 🟡�  | 8️⃣  | 8️⃣  | ❌   |
 | World Radio League | 🇺🇳 | ✅�  | ✅    | ✅    | 🇺🇳 | 🇺🇳 | ❌   |
 
-
 Columns:
 * `Enc`: Internal encoding: 8️⃣ ISO-8859-1, 🇺🇳 Unicode
 * `ISO`: Can import ISO-8859-1. � misencoded
@@ -40,38 +40,41 @@ Columns:
 
 # Other Apps
 
-| App                                                | Status                       |
-|----------------------------------------------------|------------------------------|
-| 59+ Log                                            | Discontinued                 |
-| ADIF to Excel or Excel to ADIF                     | Discontinued (2013?)         |
-| Aether Logbook                                     | Requires purchase ($40)      |
-| BBLogger                                           | Could not find download link |
-| Cabrillo Criollo LU4EG                             | Could not find download link |
-| CheckLog                                           | Instructions in Russian      |
-| CQRLOG                                             | Requires Linux               |
-| DX4Win                                             | Coult not get it to import   |
-| DXBase                                             | Website is dead              |
-| DXtreme Station Log                                | Requires purchase ($80)      |
-| Easy Log                                           | Could not find download link |
-| Ham-LCT                                            | Discontinued                 |
-| [HLog](https://www.josefsipek.net/projects/hlog/)  | -                            |
-| [ZZALog](https://sourceforge.net/projects/zzalog/) | -                            |
-| Writelog                                           | -                            |
-| Ham Office                                         | -                            |
-| HamLog                                             | -                            |
-| Ham Support                                        | -                            |
-| Journal                                            | -                            |
-| KLog                                               | -                            |
-| LOGic 9                                            | -                            |
-| NewLogOSH                                          | -                            |
-| Pignology                                          | -                            |
-| Shacklog                                           | -                            |
-| TurboLog                                           | -                            |
-| Ucxlog                                             | -                            |
-| VQLog                                              | -                            |
-| XLog                                               | -                            |
-| XMLog                                              | -                            |
-| YPLog                                              | -                            |
+| App                            | Status                       | Link                                                                    |
+|--------------------------------|------------------------------|-------------------------------------------------------------------------|
+| 59+ Log                        | Discontinued                 |                                                                         |
+| ADIF to Excel or Excel to ADIF | Discontinued (2013?)         |                                                                         |
+| Aether Logbook                 | Requires purchase ($40)      |                                                                         |
+| BBLogger                       | Could not find download link |                                                                         |
+| Cabrillo Criollo LU4EG         | Could not find download link |                                                                         |
+| CheckLog                       | Instructions in Russian      |                                                                         |
+| CQRLOG                         | Requires Linux               |                                                                         |
+| DX4Win                         | Coult not get it to import   |                                                                         |
+| DXBase                         | Website is dead              |                                                                         |
+| DXtreme Station Log            | Requires purchase ($80)      |                                                                         |
+| Easy Log                       | Could not find download link |                                                                         |
+| Ham-LCT                        | Discontinued                 |                                                                         |
+| HLog                           | -                            | https://www.josefsipek.net/projects/hlog/                               |
+| ZZALog                         | -                            | https://sourceforge.net/projects/zzalog/                                |
+| Ham Support                    | Popular in Japan             | https://apps.apple.com/us/app/ham-support-powerful-log-app/id6645736263 |
+| TURBO HamLog                   | Popular in Japan             | https://hamlog.sakura.ne.jp/                                            |
+| AirHamLog                      | Popular in Japan             | https://air-hamlog.com/                                                 |
+| Writelog                       | -                            |                                                                         |
+| Ham Office                     | -                            |                                                                         |
+| HamLog                         | -                            |                                                                         |
+| Ham Support                    | -                            |                                                                         |
+| Journal                        | -                            |                                                                         |
+| KLog                           | -                            |                                                                         |
+| LOGic 9                        | -                            |                                                                         |
+| NewLogOSH                      | -                            |                                                                         |
+| Pignology                      | -                            |                                                                         |
+| Shacklog                       | -                            |                                                                         |
+| TurboLog                       | -                            |                                                                         |
+| Ucxlog                         | -                            |                                                                         |
+| VQLog                          | -                            |                                                                         |
+| XLog                           | -                            |                                                                         |
+| XMLog                          | -                            |                                                                         |
+| YPLog                          | -                            |                                                                         |
 
 
 Columns:
@@ -335,6 +338,24 @@ This app seems to:
 * Handle fields with length past data (overcount)
 * Not transcode when importing or exporting
 * Correctly accept Unicode input in the UI
+
+---
+
+### [Ham Support](https://apps.apple.com/us/app/ham-support-powerful-log-app/id6645736263)
+
+**Version:** N/A
+
+**Tested:** 2025-09-27 by KI2D
+
+This is an iOS app popular in Japan.
+
+The app has no ADIF import functionality. Exports only the most minimal ADIF, even if the
+UI allows for full Unicode support.
+
+As you can see from the screenshot below, Japanese apps seem to rely on "CSV Files" tied to
+the two most popular apps in Japan: TURBO HamLog and AirHamLog.
+
+![Ham Support](hamsupport-20250927-ki2d/hamsupport-exports.png)
 
 ---
 
