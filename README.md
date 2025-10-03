@@ -170,6 +170,12 @@ it should now say:
 
 Note: This list is comprehensive, but certainly not exhaustive. It represents the interpretation and opinions of the author of this document,Sebastian KI2D. Feel free to follow the links to the original discussions. And of course, feel free to contribute any additional information or comments you consider relevant.
 
+It is our understanding that, besides the ADIF 4 proposal in this document, this short list are the proposals still in consideration:
+* [New ADIF container: ADU](#new-adif-container-adu)
+* [Use original fields, with HTML entity encoding](#use-original-fields-with-html-entity-encoding)
+* [Replacement encoding, using the data between fields](#replacement-encoding-using-the-data-between-fields)
+
+The other proposals all were determined to be incompatible, abandoned, or superceded by other proposals. But reading through their evolution helps understand how we got to the current set being discussed.
 
 ### Encoding headers, with byte counts, and Latin1 as the default encoding
 
@@ -203,6 +209,7 @@ While this suffered from the same problems as the previous proposal, it showcase
 
 Conclusion:
 * Same as above.
+
 
 ### Change main encoding to Latin 1, use separate _INTL fields with UTF-8 and byte counts
 
@@ -253,6 +260,7 @@ It would look like `<NAME:9>Sebasti?n <NAME_INTL:16>U2ViYXN0acOhbg== <NOTES:7>??
 Conclusion:
 * Same problems as other _INTL proposals.
 
+
 ### Use separate _INTL fields, with HTML entity encoding
 
 This was mentioned by Sebastian KI2D as an alternative to base64, potentially providing more legibility in cases where the data is limited to Latin1.
@@ -261,6 +269,7 @@ It would look like `<NAME:9>Sebastián <NAME_INTL:16>Sebasti&aacute;n <NOTES:7>?
 
 Conclusion:
 * Same problems as other _INTL proposals.
+
 
 ### Encoding headers, only allow ISO 8859 encodings
 
@@ -276,6 +285,7 @@ It would also seem to declare that ADIF is not just "a text file" but a "text fi
 
 Conclusion:
 * Breaks backwards compatibility, limits future options, does not solve the problem of extended characters.
+
 
 ### New ADIF container: ADU
 
