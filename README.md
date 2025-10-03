@@ -125,7 +125,7 @@ Change the definition of "IntlCharacter" to remove `...  (encoded with UTF-8) ..
 Change the definition of "IntlString" (and "IntlStringMultiline" in a similar way) to:
 
     A sequence of IntlCharacter, encoded according to the encoding specified in the ENCODING header, or US-ASCII if no such header is present.
-    If the encoding requires multiple bytes to represent a character then it must perform the following transformations: On export, any occurrence of the literal sequence "&lt;" must be replaced with "&amp;lt;" and then any occurrence of the character "<" must be replaced with "&lt;". On import, any occurrence of the literal sequence "&lt;" must be replaced with "<" and any occurence of the literal sequence "&amp;lt;" must be replaced with "&lt;"
+    If the encoding requires multiple bytes to represent a character, and the data contains such a multi-byte sequence, then it must perform the following transformations: On export, any occurrence of the literal sequence "&lt;" must be replaced with "&amp;lt;" and then any occurrence of the character "<" must be replaced with "&lt;". On import, any occurrence of the literal sequence "&lt;" must be replaced with "<" and any occurence of the literal sequence "&amp;lt;" must be replaced with "&lt;"
 
 ### Clarify field data length
 
