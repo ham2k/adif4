@@ -15,11 +15,11 @@ By Sebastián Delmont KI2D <ki2d@ham2k.com>
 
 ### The proposal:
 
-* Produce a [new "epoch"](https://www.adif.org/316/ADIF_316.htm#Header_Field_ADIF_VER) of the standard: ADIF 4.
+* Produce a [new "epoch"](https://www.adif.org/316/ADIF_316.htm#Header_Field_ADIF_VER) of the standard: **ADIF 4**.
 * Make all ambiguous details regarding encodings in the standard more explicit.
-* Define a new "encoding" header so that apps can explicitly state which encoding they are using.
-* Declare "US-ASCII" as the default encoding, and require apps to support importing and exporting it in order to be considered "compliant".
-* Declare that apps can reject encodings they don't support, and still be considered "compliant", but explain to the user that the rejection was due to an unexpected encoding, provide a list of supported encodings, and point the user to the page at https://fixes.adif.org/, which provides users with tools to fix encoding issues and convert between encodings.
+* Define a new `ENCODING` header so that apps can explicitly state which encoding they are using.
+* Declare "US-ASCII" as the default encoding, and require apps to support importing and exporting it in order to be considered compliant.
+* Declare that apps can reject encodings they don't support, and still be considered compliant, but explain to the user that the rejection was due to an unexpected encoding, provide a list of supported encodings, and point the user to the page at https://fixes.adif.org/, which provides users with tools to fix encoding issues and convert between encodings.
 * Suggest that apps should support "UTF-8" imports and exports.
 * Suggest that apps should support "Latin1" imports, and might even consider this the default encoding when importing pre-ADIF 4 files.
 * Allow apps to attempt to detect, and correct, possible mis-encodings in files that do not have an "encoding" header.
@@ -37,9 +37,9 @@ And many apps include these "extended characters" in the ADIF files they export.
 
 There is a problem with this: once you get past the basic english alphabet and into "extended characters", there is no such thing as a "text file" anymore. The text has to be characterized by the encoding used to convert the characters to bytes.
 
-> There are two popular encodings: "Windows-1252", which is a superset of the formal standard "ISO-8859-1", both of which encode the "Latin-1" alphabet; and "UTF-8" which encodes all characters in the Unicode standard.
+> There are two popular encodings: "Windows-1252", which is a superset of the formal standard "ISO 8859-1", both of which encode the "Latin1" alphabet; and "UTF-8" which encodes all characters in the Unicode standard.
 >
-> There are other useful encodings, including other 8-bit code page encodings in the ISO-8859 family, covering alphabets like greek, cyrillic and more, or Shift-JIS for Japanese characters.
+> There are other useful encodings, including other 8-bit code page encodings in the ISO 8859 family, covering alphabets like greek, cyrillic and more, or Shift-JIS for Japanese characters.
 >
 > But for simplicity, we will keep the discussion around the main two, and use the terms "Latin1" and "UTF-8" to refer to each one of them.
 
@@ -124,35 +124,36 @@ Change the definition of "IntlCharacter" to remove `...  (encoded with UTF-8) ..
 
 Change the definition of "IntlString" (and "IntlStringMultiline" in a similar way) to:
 
-    A sequence of IntlCharacter, encoded according to the encoding specified in the ENCODING header, or US-ASCII if no such header is present.
-    If the encoding requires multiple bytes to represent a character, and the data contains such a multi-byte sequence, then it must perform the following transformations: On export, any occurrence of the literal sequence "&lt;" must be replaced with "&amp;lt;" and then any occurrence of the character "<" must be replaced with "&lt;". On import, any occurrence of the literal sequence "&lt;" must be replaced with "<" and any occurence of the literal sequence "&amp;lt;" must be replaced with "&lt;"
+> A sequence of IntlCharacter, encoded according to the encoding specified in the ENCODING header, or US-ASCII if no such header is present.
+>
+> If the encoding requires multiple bytes to represent a character, and the data contains such a multi-byte sequence, then it must perform the following transformations: On export, any occurrence of the literal sequence "&lt;" must be replaced with "&amp;lt;" and then any occurrence of the character "<" must be replaced with "&lt;". On import, any occurrence of the literal sequence "&lt;" must be replaced with "<" and any occurence of the literal sequence "&amp;lt;" must be replaced with "&lt;"
 
 ### Clarify field data length
 
 Change section "IV.A.1. ADI Data-Specifiers" so that
 
-    ... followed by data D of length L: ...
+> ... followed by data D of length L: ...
 
 is updated to read
 
-    ... followed by data D consisting of L characters as defined by the file encoding specified in the ENCODING header, or as defined by US-ASCII if no ENCODING header is present.
+> ... followed by data D consisting of L characters as defined by the file encoding specified in the ENCODING header, or as defined by US-ASCII if no ENCODING header is present.
 
 ### Clarify file encodings and handling
 
 Change section "IV.A. ADI File Format" so that where it currently says:
 
-    ADI files are text files that are typically exported with a .adi file name extension. Applications should additionally accept files with a .adif file name extension.
+> ADI files are text files that are typically exported with a .adi file name extension. Applications should additionally accept files with a .adif file name extension.
 
 it should now say:
 
-    ADI files are text files, encoded according to the encoding specified in the ENCODING header, or US-ASCII if no such header is present.
-
-    Compliant applications must accept files encoded as US-ASCII. Applications should also accept files encoded as UTF-8.
-
-    An application might reject a file encoded with an encoding it does not recognize, but in that case it should display a message to the user indicating that the encoding was not recognized, listing what encodings are acceptable by the application, and pointing the user at https://fixes.adif.org/" for more information.
-
-    An application might attempt to correct mis-encoded data when appropriate, such as detecting Latin-1 or UTF-8 sequences in a file supposed to be US-ASCII.
-
-    ADI files are typically exported with a .adi file name extension. Applications should additionally accept files with a .adif file name extension.
+> ADI files are text files, encoded according to the encoding specified in the ENCODING header, or US-ASCII if no such header is present.
+>
+>Compliant applications must accept files encoded as US-ASCII. Applications should also accept files encoded as UTF-8.
+>
+>An application might reject a file encoded with an encoding it does not recognize, but in that case it should display a message to the user indicating that the encoding was not recognized, listing what encodings are acceptable by the application, and pointing the user at https://fixes.adif.org/" for more information.
+>
+>An application might attempt to correct mis-encoded data when appropriate, such as detecting Latin-1 or UTF-8 sequences in a file supposed to be US-ASCII.
+>
+>ADI files are typically exported with a .adi file name extension. Applications should additionally accept files with a .adif file name extension.
 
 
