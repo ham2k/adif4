@@ -1,6 +1,6 @@
 # ADIF 4 - A Proposal
 
-By Sebastián Delmont KI2D <ki2d@ham2k.com>
+By Sebastián Delmont • KI2D • <ki2d@ham2k.com>
 
 # TL;DR
 
@@ -24,8 +24,9 @@ By Sebastián Delmont KI2D <ki2d@ham2k.com>
 * Suggest that apps should support "Latin1" imports, and might even consider this the default encoding when importing pre-ADIF 4 files.
 * Allow apps to attempt to detect, and correct, possible mis-encodings in files that do not have an "encoding" header.
 
+---
 
-## Why do we need to talk about changes to the standard?
+# Why do we need to talk about changes to the standard?
 
 The [ADIF Standard](https://www.adif.org/316/ADIF_316.htm) was defined from the very beginning as a ["text format"](https://www.adif.org/316/ADIF_316.htm#:~:text=ADI%20files%20are%20text%20files). It mentions line breaks, 7-bit ASCII, and the use of ASCII digits for any numeric values.
 
@@ -57,8 +58,9 @@ This has caused extended discussions in the ADIF community, and has led to a lot
 
 This proposal starts from the premise that all three encodings (and even any other standard encoding)should be considered valid, but that not everybody has to be required to support all three.
 
+---
 
-## What is the proposal?
+# What is the proposal?
 
 First, **we should make this a new major version of the standard, ADIF 4**. In order to make it easier to communicate with users, and between developers, that from this clearly marked point on we are talking about a standard that supports multiple encodings and thus requires specificity about which encoding is being used.
 
@@ -86,7 +88,7 @@ And Seventh, in order to ensure full backwards compatibility, and prevent existi
 
 ---
 
-## What does this mean for existing apps?
+# What does this mean for existing apps?
 
 Any currently-compliant apps can remain unchanged and be able to interoperate with apps updated to ADIF 4 in all cases that were valid when the app was written. These apps should not miss any records or fields, and should be able to display all data correctly, as long as this data is limited to US-ASCII.
 
