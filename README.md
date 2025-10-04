@@ -36,7 +36,7 @@ The [ADIF Standard](https://www.adif.org/316/ADIF_316.htm) was defined from the 
 
 The standard does explicitly state that `String` fields should be limited to ["ASCII [...] in the range of 32 through 126"](https://www.adif.org/316/ADIF_316.htm#:~:text=an%20ASCII%20character%20whose%20code%20lies%20in%20the%20range%20of%2032%20through%20126%2C%20inclusive). This is also known officially as "US-ASCII".
 
-However, in the real world, most applications alllowed users to enter "extended characters", such as accented letters like the "ñ" in "Muñoz", the "ü" in "Müller" or the "ß" in "Straße".
+However, in the real world, most applications alllowed users to enter "extended characters", such as accented letters like the `"ñ"` in `"Muñoz"`, the `"ü"` in `"Müller"` or the `"ß"` in `"Straße"`.
 
 And many applications include these "extended characters" in the ADIF files they export. This is clearly not compliant with the standard, but definitely prevalent (see [survey results](survey-results/README.md)).
 
@@ -88,7 +88,7 @@ Sixth, we should suggest that **applications should support "ISO-8859-1" imports
 
 It **would not be unreasonable to actually declare "ISO-8859-1" as the official default encoding** for pre-ADIF 4 as long as we're ok with the implication that such a change would **make the new standard not be strictly backwards-compatible**. This would increase the likelihood, but not ensure, of a file exported from an existing application being interpreted correctly by an encoding-aware application. If we prefer to keep the standard strictly backwards-compatible, we can just leave it as a suggestion and keep US-ASCII as the default encoding.
 
-And Seventh, in order to ensure full backwards compatibility, and prevent existing compliant applications from misinterpreting a file encoded as UTF-8, but opened by an application that assumes that characters are bytes, **any encoding that uses more than one byte per character** (such as UTF-8) should perform one extra step, of **escaping any "<" character using the sequence "&lt;"** when exporting ADIF data, and unescaping it when importing such ADIF data. This prevents any application from mistaking unexpected data in a field for the start of the next field.
+And Seventh, in order to ensure full backwards compatibility, and prevent existing compliant applications from misinterpreting a file encoded as UTF-8, but opened by an application that assumes that characters are bytes, **any encoding that uses more than one byte per character** (such as UTF-8) should perform one extra step, of **escaping any "<" character using the sequence `"&lt;"`** when exporting ADIF data, and unescaping it when importing such ADIF data. This prevents any application from mistaking unexpected data in a field for the start of the next field.
 
 ---
 
@@ -98,7 +98,7 @@ And Seventh, in order to ensure full backwards compatibility, and prevent existi
 
 **Any currently-compliant applications can remain unchanged and be able to interoperate with applications updated to ADIF 4** in all cases that were valid when the application was written. These applications should not miss any records or fields, and should be able to display all data correctly, **as long as this data is limited to US-ASCII**.
 
-**These applications can also remain unchanged and still be able to interoperate, with minimal data loss on non-mandatory fields with string data containing extended characters, when importing from ADIF 4 files with encodings other than US-ASCII.** These applications would possibly display a truncated version of these strings, and/or replace any non-US-ASCII characters with "?" or similar. Since the standard has never specified what is the behavior of applications in the case of unexpected data in strings, this is not considered as breaking backwards compatibility, in the same way that an older application not displaying a newly defined enum value is not considered as breaking backwards compatibility.
+**These applications can also remain unchanged and still be able to interoperate, with minimal data loss on non-mandatory fields with string data containing extended characters, when importing from ADIF 4 files with encodings other than US-ASCII.** These applications would possibly display a truncated version of these strings, and/or replace any non-US-ASCII characters with `"?"` or similar. Since the standard has never specified what is the behavior of applications in the case of unexpected data in strings, this is not considered as breaking backwards compatibility, in the same way that an older application not displaying a newly defined enum value is not considered as breaking backwards compatibility.
 
 **Most of these applications can also remain unchanged and still be able to interoperate with _most_ cases that are _prevalent_ in real world usage.** In many cases they can exchange data containing extended characters with other applications that happen to use the same internal encodings, **even if this is a non-compliant scenario.**
 
@@ -132,7 +132,7 @@ Change the definition of "IntlString" (and "IntlStringMultiline" in a similar wa
 
 > A sequence of IntlCharacter, encoded according to the encoding specified in the ENCODING header, or US-ASCII if no such header is present.
 >
-> If the encoding requires multiple bytes to represent a character, and the data contains such a multi-byte sequence, then it must perform the following transformations in this order: On export, any occurrence of the US-ASCII character "&" must be replaced with "&amp;" and then any occurrence of the character "<" must be replaced with "&lt;". On import, any occurrence of the character sequence "&lt;" must be replaced with "<" and any occurence of the character sequence "&amp;" must be replaced with "&". These transformed sequences would be counted as part of the data length, so "á<é" would be transformed to "á&lt;é" and have a field length of 6 characters. But "a<e" would not have any transformations applied and have a field length of 3 characters.
+> If the encoding requires multiple bytes to represent a character, and the data contains such a multi-byte sequence, then it must perform the following transformations in this order: On export, any occurrence of the US-ASCII character `"&"` must be replaced with `"&amp;"` and then any occurrence of the character `"<"` must be replaced with `"&lt;"`. On import, any occurrence of the character sequence `"&lt;"` must be replaced with `"<"` and any occurence of the character sequence `"&amp;"` must be replaced with `"&"`. These transformed sequences would be counted as part of the data length, so `"á<é"` would be transformed to `"á&lt;é"` and have a field length of 6 characters. But `"a<e"` would not have any transformations applied and have a field length of 3 characters.
 
 ### Clarify field data length
 
@@ -241,7 +241,7 @@ By using HTML entity encoding (formally, ["character reference encoding"](https:
 
 Implementation would require some changes, but uses an encoding mechanism that has broad support in the industry (it's used by XML, HTML and more) and for which there are well-tested libraries available on every language, framework and platform.
 
-In this discussion, and other threads, some people, starting with Jack W6FB in [this message](https://groups.io/g/adifdev/message/10416), expressed the opinion that an existing application displaying something like "Sebasti&aacute;n" could be considered as breaking backwards compatibility.
+In this discussion, and other threads, some people, starting with Jack W6FB in [this message](https://groups.io/g/adifdev/message/10416), expressed the opinion that an existing application displaying something like `"Sebasti&aacute;n"` could be considered as breaking backwards compatibility.
 
 Conclusion:
 * Works, but requires broad adoption.
@@ -324,13 +324,13 @@ Sebastian KI2D also pointed out that creating a novel encoding is not a trivial 
 
 But it was pointed out that ultimately, it suffers from the same problem that the "_INTL Field" proposals have: data is lost when doing a round trip in an existing application.
 
-Also, we could not reach agreement on whether "Sebasti&aacute;n" or "Sebasti?n" or even "Sebastian" were acceptable replacements for "Sebastián". But perhaps the distinction is clearer with "???????" being unacceptable replacement for "이건 예시예요".
+Also, we could not reach agreement on whether `"Sebasti&aacute;n"` or `"Sebasti?n"` or even `"Sebastian"` were acceptable replacements for `"Sebastián"`. But perhaps the distinction is clearer with `"???????"` being unacceptable replacement for `"이건 예시예요"`.
 
 Conclusion:
 * Works, but only if everybody adopts it, and implementation is not trivial. Cannot do round-trip interoperation with existing applications.
 
 Learnings:
-* It was in this discussion that we realized that the data between fields could be used, as long as we did not include a "<" character. This is where the idea of using &lt; to escape UTF-8 strings and prevent breakage first popped up (see [this message](https://groups.io/g/adifdev/message/11113)) leading to the final proposal.
+* It was in this discussion that we realized that the data between fields could be used, as long as we did not include a "<" character. This is where the idea of using `"&lt;"` to escape UTF-8 strings and prevent breakage first popped up (see [this message](https://groups.io/g/adifdev/message/11113)) leading to the final proposal.
 * It was also in the discussion around what was an acceptable replacement that Sebastian KI2D first noted that any string with extended characters was a "new type of value" being introduced in a new version of the standard, and thus how an existing application represented it, or even failure to represent it, was not a backwards compatibility issue, in the same way that an older application failing to dislay `<MODE:4>MFSK<SUBMODE:3>FT4` as "FT4" was not a backwards compatibility issue.
 
 
