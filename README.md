@@ -90,7 +90,7 @@ Sixth, we should suggest that **applications should support "ISO-8859-1" imports
 
 It **would not be unreasonable to actually declare "ISO-8859-1" as the official default encoding** for pre-ADIF 4 as long as we're ok with the implication that such a change would **make the new standard not be strictly backwards-compatible**. This would increase the likelihood, but not ensure, of a file exported from an existing application being interpreted correctly by an encoding-aware application. If we prefer to keep the standard strictly backwards-compatible, we can just leave it as a suggestion and keep US-ASCII as the default encoding.
 
-And Seventh, in order to ensure full backwards compatibility, and prevent existing compliant applications from misinterpreting a file encoded as UTF-8, but opened by an application that assumes that characters are bytes, **any encoding that uses more than one byte per character** (such as UTF-8) should perform one extra step, of **escaping any "<" character using the sequence `"&lt;"`** when exporting ADIF data, and unescaping it when importing such ADIF data. This prevents any application from mistaking unexpected data in a field for the start of the next field.
+And Seventh, in order to ensure full backwards compatibility, and prevent existing compliant applications from misinterpreting a file encoded as UTF-8, but opened by an application that assumes that characters are bytes, **any encoding that uses more than one byte per character** (such as UTF-8) should perform one extra step, of **escaping any `"<"` character using the sequence `"&lt;"`** when exporting ADIF data, and unescaping it when importing such ADIF data. This prevents any application from mistaking unexpected data in a field for the start of the next field.
 
 ---
 
@@ -332,7 +332,7 @@ Conclusion:
 * Works, but only if everybody adopts it, and implementation is not trivial. Cannot do round-trip interoperation with existing applications.
 
 Learnings:
-* It was in this discussion that we realized that the data between fields could be used, as long as we did not include a "<" character. This is where the idea of using `"&lt;"` to escape UTF-8 strings and prevent breakage first popped up (see [this message](https://groups.io/g/adifdev/message/11113)) leading to the final proposal.
+* It was in this discussion that we realized that the data between fields could be used, as long as we did not include a `"<"` character. This is where the idea of using `"&lt;"` to escape UTF-8 strings and prevent breakage first popped up (see [this message](https://groups.io/g/adifdev/message/11113)) leading to the final proposal.
 * It was also in the discussion around what was an acceptable replacement that Sebastian KI2D first noted that any string with extended characters was a "new type of value" being introduced in a new version of the standard, and thus how an existing application represented it, or even failure to represent it, was not a backwards compatibility issue, in the same way that an older application failing to dislay `<MODE:4>MFSK<SUBMODE:3>FT4` as "FT4" was not a backwards compatibility issue.
 
 
