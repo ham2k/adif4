@@ -2,6 +2,8 @@
 
 By Sebastián Delmont • KI2D • <ki2d@ham2k.com>
 
+(If you're reading this on Github, you can see the exact time of the last update near the top right corner of the page, as well as a link to the full history of changes. If you're not reading this on Github, you can find the latest version at https://github.com/ham2k/adif4/README.md)
+
 # TL;DR
 
 ### The problem:
