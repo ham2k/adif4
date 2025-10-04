@@ -62,7 +62,7 @@ So we have a "Schrödinger's Standard", that can be either US-ASCII, ISO-8859-1 
 
 This has caused extended discussions in the ADIF community, and has led to a lot of confusion and frustration. With different parties arguing that their interpretation of "what text is" is the correct one.
 
-This proposal starts from the premise that all three encodings (and any other standard encoding that is a superset of "US-ASCII") should be considered valid, but that not everybody has to be required to support all three.
+**So this proposal starts from the premise that all three encodings (and any other standard encoding that is a superset of "US-ASCII") should be considered valid, but that not everybody has to be required to support all three.**
 
 ---
 
