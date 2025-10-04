@@ -7,9 +7,9 @@ By Sebastián Delmont • KI2D • <ki2d@ham2k.com>
 ### The problem:
 
 * Users want to use "extended characters" in their logs, and exchange the with other applications, services and users. The standard does not allow it, but many applications do this in many incompatible ways.
-* ADIF is "text based", but does not specify the encoding to use in this "text", since this didn't matter for 7-bit ASCII.
+* ADIF is "text based", but does not specify the encoding to use in this "text", since this didn't matter for US-ASCII.
 * ADIF uses "data lengths" to determine the amount of the data in each field, but does not specify whether these should be counted in bytes or characters, since this didn't matter for US-ASCII.
-* [Developers have used both](survey-results/README.md) 8-bit encodings and UTF-8 in their applications, and while both are equivalent for 7-bit ASCII, once you add "extended characters", the two encodings are not equivalent, and applications can break not only by showing the wrong characters, but by truncating data, including extraneous data, or even dropping fields or entire records.
+* [Developers have used both](survey-results/README.md) 8-bit encodings and UTF-8 in their applications, and while both are equivalent for US-ASCII, once you add "extended characters", the two encodings are not equivalent, and applications can break not only by showing the wrong characters, but by truncating data, including extraneous data, or even dropping fields or entire records.
 * ***So, we have, at the very least, three different ways to interpret the standard, based on which encoding you pick: ASCII, ISO-8859-1 and UTF-8.*** And these are incompatible with each other if you want to consider including "extended characters" in the standard.
 
 ### The proposal:
@@ -32,15 +32,15 @@ By Sebastián Delmont • KI2D • <ki2d@ham2k.com>
 
 # Why do we need to talk about changes to the standard?
 
-The [ADIF Standard](https://www.adif.org/316/ADIF_316.htm) was defined from the very beginning as a ["text format"](https://www.adif.org/316/ADIF_316.htm#:~:text=ADI%20files%20are%20text%20files). It mentions line breaks, 7-bit ASCII, and the use of ASCII digits for any numeric values.
+The [ADIF Standard](https://www.adif.org/316/ADIF_316.htm) was defined from the very beginning as a ["text format"](https://www.adif.org/316/ADIF_316.htm#:~:text=ADI%20files%20are%20text%20files). It mentions line breaks, "ASCII", and the use of "ASCII digits" for any numeric values.
 
-The standard does explicitly state that `String` fields should be limited to ["ASCII [...] in the range of 32 through 126"](https://www.adif.org/316/ADIF_316.htm#:~:text=an%20ASCII%20character%20whose%20code%20lies%20in%20the%20range%20of%2032%20through%20126%2C%20inclusive). This is also known officially as "US-ASCII".
+The standard does explicitly state that "String" fields should be limited to ["ASCII [...] in the range of 32 through 126"](https://www.adif.org/316/ADIF_316.htm#:~:text=an%20ASCII%20character%20whose%20code%20lies%20in%20the%20range%20of%2032%20through%20126%2C%20inclusive). This is what is known officially as "US-ASCII".
 
 However, in the real world, most applications alllowed users to enter "extended characters", such as accented letters like the `"ñ"` in `"Muñoz"`, the `"ü"` in `"Müller"` or the `"ß"` in `"Straße"`.
 
 And many applications include these "extended characters" in the ADIF files they export. This is clearly not compliant with the standard, but definitely prevalent (see [survey results](survey-results/README.md)).
 
-There is a problem with this: once you get past the basic english alphabet and into "extended characters", there is no such thing as a "text file" anymore. The text has to be characterized by the encoding used to convert the characters to bytes.
+There is a problem with this: for computers, there is no such thing as a "text file"; there are "US-ASCII text files", "UTF-8 text files", "ISO-8859-1 text files", and so on. The file has to be interpreted according to the encoding used in order to convert characters to bytes and vice versa. And while many programmers grew up believing "text file" was equivalent to "US-ASCII text file", such assumption is not valid anymore.
 
 > There are two popular encodings: "ISO-8859-1" (actually, to be precise, most of the time this is interpreted to mean "Windows-1252", which is a superset of "ISO-8859-1" but not an official standard, yet it is broadly used) which encodes the most common characters in what is known as the "Latin alphabet", and "UTF-8" which encodes all characters in the Unicode standard.
 >
@@ -52,15 +52,15 @@ Both "ISO-8859-1" and "UTF-8" are supersets of "US-ASCII" (plain english alphabe
 
 But the two encodings are not compatible once you consider "extended characters". More importantly, **"ISO-8859-1" assumes that each character is encoded as a single byte**, while **"UTF-8" uses multi-byte sequences** to represent characters outside of "US-ASCII".
 
-Now, the ADIF standard uses "data length" counts to determine the amount of data in each field. **But the standard never defined whether these lengths should count bytes or characters**. For "US-ASCII", the two are equivalent, but for "extended characters", they are not.
+Now, the ADIF standard uses "data length" counts to determine the amount of data in each field. **But the standard never defined whether these lengths should count bytes or characters**. For files that include only the characters supported by "US-ASCII", counting bytes or characters does not make a difference, but once you add "extended characters" into the mix, different encodings have different interpretations of how many bytes you need to represent a character.
 
-And developers have implemented their applications using logic that assumes either encoding, [with major applications on either side of the fence](survey-results/README.md). Most likely this was the result of just using the "text primitives" available in their programming language or environment of choice. Old Win32 applications would have used the Windows API, which uses "Windows-1252" by default, while new .NET applications would have used the .NET Framework, which uses "UTF-8" by default. Newer languages like Java, Python and Javascript all use Unicode internally too.
+And developers have implemented their applications using logic that assumes either encoding, [with major applications on either side of the fence](survey-results/README.md). Most likely this was the result of just using the "text primitives" available in their programming language or environment of choice. Old Win32 applications would have used the Windows API, which uses "Windows-1252" by default, while new .NET applications would have used the .NET Framework, which uses "UTF-8" by default. Newer languages like Java, Python and Javascript all use Unicode internally, too.
 
 So we have a "Schrödinger's Standard", that can be either US-ASCII, ISO-8859-1 or UTF-8 depending on who you ask, and you cannot really tell which it is until you bring extended characters into the mix.
 
 This has caused extended discussions in the ADIF community, and has led to a lot of confusion and frustration. With different parties arguing that their interpretation of "what text is" is the correct one.
 
-This proposal starts from the premise that all three encodings (and even any other standard encoding)should be considered valid, but that not everybody has to be required to support all three.
+This proposal starts from the premise that all three encodings (and any other standard encoding that is a superset of "US-ASCII") should be considered valid, but that not everybody has to be required to support all three.
 
 ---
 
